@@ -1,3 +1,5 @@
+#include <X11/XF86keysym.h>
+
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
@@ -16,6 +18,8 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       0,            1,           -1 },
 	*/
 	{ "firefox",  NULL,       1 << 8,       0,           -1 },
+        { "nomacs",   NULL,       0,            1,           -1 },
+        { "Media viewer",   NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -33,7 +37,7 @@ static const MonitorRule monrules[] = {
 	{ "eDP-1",    0.5,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 	*/
 	/* defaults */
-	{ NULL,       0.55, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+	{ NULL,       0.5, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 };
 
 /* keyboard */
@@ -91,7 +95,7 @@ LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
 
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
-#define MODKEY WLR_MODIFIER_ALT
+#define MODKEY WLR_MODIFIER_LOGO
 
 #define TAGKEYS(KEY,SKEY,TAG) \
 	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
@@ -119,7 +123,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_C,          killclient,     {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_f,          setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
@@ -142,6 +146,14 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                   7),
 	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                  8),
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
+	{ 0,                            XF86XK_AudioRaiseVolume,        spawn,  SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof someblocks)") },
+        { 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
+        { 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
+        { 0,                            XF86XK_AudioMicMute,            spawn,  SHCMD("pactl set-source-mute \"@DEFAULT_SOURCE@\" toggle")},
+//      { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("xbacklight -inc 20; kill -37 $(pidof dwmblocks)")},
+//      { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("xbacklight -dec 20; kill -37 $(pidof dwmblocks)") },
+        { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("lux -a 10%; kill -37 $(pidof dwmblocks)")},
+        { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("lux -s 10%; kill -37 $(pidof dwmblocks)") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
