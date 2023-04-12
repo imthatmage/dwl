@@ -288,6 +288,7 @@ static void rendermon(struct wl_listener *listener, void *data);
 static void requeststartdrag(struct wl_listener *listener, void *data);
 static void resize(Client *c, struct wlr_box geo, int interact);
 static void run(char *startup_cmd);
+static void runAutostart(void);
 static void setcursor(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
 static void setfullscreen(Client *c, int fullscreen);
@@ -2436,6 +2437,11 @@ toggleview(const Arg *arg)
 }
 
 void
+runAutostart(void) {
+	system("cd ~/dwl; ./autostart.sh &");
+}
+
+void
 unlocksession(struct wl_listener *listener, void *data)
 {
 	SessionLock *lock = wl_container_of(listener, lock, unlock);
@@ -2826,6 +2832,7 @@ main(int argc, char *argv[])
 	if (!getenv("XDG_RUNTIME_DIR"))
 		die("XDG_RUNTIME_DIR must be set");
 	setup();
+	runAutostart();
 	run(startup_cmd);
 	cleanup();
 	return EXIT_SUCCESS;
