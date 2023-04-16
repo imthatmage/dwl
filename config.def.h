@@ -46,7 +46,8 @@ static const struct xkb_rule_names xkb_rules = {
 	/* example:
 	.options = "ctrl:nocaps",
 	*/
-	.options = NULL,
+	.layout = "us,ru",
+	.options = "grp:alt_shift_toggle",
 };
 
 static const int repeat_rate = 25;
@@ -123,7 +124,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
 	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
-	{ MODKEY, 		     XKB_KEY_q,          killclient,     {0} },
+	{ MODKEY, 		     					 XKB_KEY_q,          killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_f,          setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
@@ -147,13 +148,13 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                  8),
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
 	{ 0,                            XF86XK_AudioRaiseVolume,        spawn,  SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof someblocks)") },
-        { 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
-        { 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
-        { 0,                            XF86XK_AudioMicMute,            spawn,  SHCMD("pactl set-source-mute \"@DEFAULT_SOURCE@\" toggle")},
+	{ 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
+ 	{ 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
+  { 0,                            XF86XK_AudioMicMute,            spawn,  SHCMD("pactl set-source-mute \"@DEFAULT_SOURCE@\" toggle")},
 //      { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("xbacklight -inc 20; kill -37 $(pidof dwmblocks)")},
 //      { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("xbacklight -dec 20; kill -37 $(pidof dwmblocks)") },
-        { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("lux -a 10%; kill -37 $(pidof someblocks)")},
-        { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("lux -s 10%; kill -37 $(pidof someblocks)") },
+  { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("lux -a 10%; kill -37 $(pidof someblocks)")},
+  { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("lux -s 10%; kill -37 $(pidof someblocks)") },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
