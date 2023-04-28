@@ -17,9 +17,9 @@ static const Rule rules[] = {
 	/* examples:
 	{ "Gimp",     NULL,       0,            1,           -1 },
 	*/
-	{ "firefox",  NULL,       1 << 8,       0,           -1 },
-        { "nomacs",   NULL,       0,            1,           -1 },
-        { "Media viewer",   NULL,       0,            1,           -1 },
+	{ "firefox",  			NULL,       1 << 8,       0,           -1 },
+	{ "nomacs",   			NULL,       0,            1,           -1 },
+ 	{ "Media viewer",   NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -109,7 +109,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 /* commands */
 static const char *termcmd[] = { "foot", NULL };
-static const char *menucmd[] = { "bemenu-run", NULL };
+static const char *menucmd[] = { "wofi", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
@@ -147,6 +147,7 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                   7),
 	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                  8),
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
+	{ MODKEY, 									 XKB_KEY_u,          spawn,          SHCMD("swaylock -c 000000") },
 	{ 0,                            XF86XK_AudioRaiseVolume,        spawn,  SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof someblocks)") },
 	{ 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
  	{ 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
