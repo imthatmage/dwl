@@ -3,7 +3,13 @@
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
+static const int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
+static const int monoclegaps               = 0;  /* 1 means outer gaps in monocle layout */
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
+static const unsigned int gappih           = 10; /* horiz inner gap between windows */
+static const unsigned int gappiv           = 10; /* vert inner gap between windows */
+static const unsigned int gappoh           = 10; /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const float bordercolor[]           = {0.5, 0.5, 0.5, 1.0};
 static const float focuscolor[]            = {1.0, 0.0, 0.0, 1.0};
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
@@ -125,6 +131,22 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_d,          incnmaster,     {.i = -1} },
 	{ MODKEY,                    XKB_KEY_h,          setmfact,       {.f = -0.05} },
 	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_h,          incgaps,       {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_l,          incgaps,       {.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,   XKB_KEY_H,      incogaps,      {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,   XKB_KEY_L,      incogaps,      {.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_CTRL,    XKB_KEY_h,      incigaps,      {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_CTRL,    XKB_KEY_l,      incigaps,      {.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_0,          togglegaps,     {0} },
+	{ MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,   XKB_KEY_parenright,defaultgaps,    {0} },
+	{ MODKEY,                    XKB_KEY_y,          incihgaps,     {.i = +1 } },
+	{ MODKEY,                    XKB_KEY_o,          incihgaps,     {.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_o,          incivgaps,     {.i = -1 } },
+    { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_y,          incivgaps,     {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_y,          incohgaps,     {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_o,          incohgaps,     {.i = -1 } },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Y,          incovgaps,     {.i = +1 } },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          incovgaps,     {.i = -1 } },
 	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
 	{ MODKEY, 		     		 XKB_KEY_q,          killclient,     {0} },
@@ -134,35 +156,35 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
 	{ MODKEY,                    XKB_KEY_b,          togglesticky,   {0} },
-	{ MODKEY,                    XKB_KEY_e,         togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,            {.ui = ~0} },
-	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
-	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
-	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
-	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
-	TAGKEYS(          XKB_KEY_4, XKB_KEY_dollar,                     3),
-	TAGKEYS(          XKB_KEY_5, XKB_KEY_percent,                    4),
-	TAGKEYS(          XKB_KEY_6, XKB_KEY_asciicircum,                5),
-	TAGKEYS(          XKB_KEY_7, XKB_KEY_ampersand,                  6),
-	TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                   7),
-	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                  8),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
-	{ MODKEY, 									 XKB_KEY_u,          spawn,          SHCMD("swaylock -c 000000") },
-	{ 0,                            XF86XK_AudioRaiseVolume,        spawn,  SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof someblocks)") },
-	{ 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
- 	{ 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
-  { 0,                            XF86XK_AudioMicMute,            spawn,  SHCMD("pactl set-source-mute \"@DEFAULT_SOURCE@\" toggle")},
-//      { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("xbacklight -inc 20; kill -37 $(pidof dwmblocks)")},
-//      { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("xbacklight -dec 20; kill -37 $(pidof dwmblocks)") },
-  { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("lux -a 10%; kill -37 $(pidof someblocks)")},
-  { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("lux -s 10%; kill -37 $(pidof someblocks)") },
+    { MODKEY,                    XKB_KEY_e,         togglefullscreen, {0} },
+    { MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,            {.ui = ~0} },
+    { MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },
+    { MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
+    TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
+    TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
+    TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
+    TAGKEYS(          XKB_KEY_4, XKB_KEY_dollar,                     3),
+    TAGKEYS(          XKB_KEY_5, XKB_KEY_percent,                    4),
+    TAGKEYS(          XKB_KEY_6, XKB_KEY_asciicircum,                5),
+    TAGKEYS(          XKB_KEY_7, XKB_KEY_ampersand,                  6),
+    TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                   7),
+    TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                  8),
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
+    { MODKEY, 									XKB_KEY_u,          spawn,  SHCMD("swaylock -c 000000") },
+    { 0,                            XF86XK_AudioRaiseVolume,        spawn,  SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof someblocks)") },
+    { 0,                            XF86XK_AudioLowerVolume,        spawn,  SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof someblocks)") },
+    { 0,                            XF86XK_AudioMute,               spawn,  SHCMD("pamixer -t; kill -36 $(pidof someblocks)") },
+    { 0,                            XF86XK_AudioMicMute,            spawn,  SHCMD("pactl set-source-mute \"@DEFAULT_SOURCE@\" toggle")},
+    //      { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("xbacklight -inc 20; kill -37 $(pidof dwmblocks)")},
+    //      { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("xbacklight -dec 20; kill -37 $(pidof dwmblocks)") },
+    { 0,                            XF86XK_MonBrightnessUp,         spawn,  SHCMD("lux -a 10%; kill -37 $(pidof someblocks)")},
+    { 0,                            XF86XK_MonBrightnessDown,       spawn,  SHCMD("lux -s 10%; kill -37 $(pidof someblocks)") },
 
-	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
-	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
+    /* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
+    { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
 #define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }
 	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
 	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
