@@ -25,6 +25,7 @@ static const Rule rules[] = {
 	*/
 	{ "firefox",  			NULL,       1 << 8,       0,           -1 },
 	{ "nomacs",   			NULL,       0,            1,           -1 },
+	{ "thunar",   			NULL,       0,            1,           -1 },
  	{ "Media viewer",   NULL,       0,            1,           -1 },
 };
 
